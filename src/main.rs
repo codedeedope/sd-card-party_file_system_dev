@@ -1,8 +1,17 @@
-mod storage_management;
-mod storage_management_dbg;
+mod storage;
 
-use storage_management::*;
+/*
+#![feature(core)]
+#![feature(collections)]
+
+extern crate collections;
+use collections::vec::*;
+*/
+
+//slices: Prefer over owned type if only immutable access is needed
+
+//test mc code language core features with mc project
 
 fn main() {
-    mbr_fat32_reader::test();
+    storage::test_debug::test();
 }
