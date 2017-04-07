@@ -10,16 +10,29 @@ pub struct FileStorageDebug {
 
 impl BlockDevice for FileStorageDebug {
     fn read_blocks(&self, offset: usize, number: usize) ->Vec<u8> {
-        if self.file_buffer.len() >= (offset + number) * 512 {
+        if self.file_buffer.len() >= (offset + number) * self.block_size() {
             let mut buf: Vec<u8> = Vec::new();
-            buf.reserve(number * 512);
-            for b in self.file_buffer[(offset * 512)..((offset + number) * 512)].iter() {
+            buf.reserve(number * self.block_size());
+            for b in self.file_buffer[(offset * self.block_size())..((offset + number) * self.block_size())].iter() {
                 buf.push(*b);
             }
             buf
         } else {
             Vec::new()
         }
+    }
+    
+    #[allow(unused_variables)]
+    fn write_blocks(&self, offset: usize, blocks: Vec<u8>) -> Result<usize, ()> {
+        unimplemented!();
+    }
+    
+    fn number_of_blocks(&self) -> usize {
+        self.file_buffer.len() / self.block_size()
+    }
+    
+    fn block_size(&self) -> usize {
+        512
     }
 } 
 
@@ -38,9 +51,5 @@ impl FileStorageDebug {
         FileStorageDebug {
             file_buffer: buf
         }
-    }
-
-    pub fn len(&self) ->usize {
-        self.file_buffer.len()
     }
 }
