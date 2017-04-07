@@ -23,11 +23,12 @@ pub enum PartitionType {
 
 pub fn test() {
     let fsd = FileStorageDebug::new(Path::new("fat32.img"));
-    let mbr = fsd.read_blocks(0, 1);
-    let mbr_device_triver = MbrDeviceDriver::new(mbr);
-    let pt: u8 = mbr_device_triver.get_first_partition_type();
+    let mbr_device_triver = MbrDeviceDriver::new(&fsd);
+    //let pt: u8 = mbr_device_triver.get_first_partition_type();
     //let fs: usize = mbr_device_triver.get_first_partition_startsector_lba();
     //let ns: usize = mbr_device_triver.get_first_partition_number_of_sectors_lba();
+
+    let pt = 0x0B;
 
     let opt: Option<char> = char::from_u32(pt as u32); //from collections?
     let ch = match opt {

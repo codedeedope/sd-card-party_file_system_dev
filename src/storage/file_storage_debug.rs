@@ -5,14 +5,13 @@ use std::io::Read;
 use std::path::Path;
 
 pub struct FileStorageDebug {
-    file_buffer: Vec<u8>,
+    file_buffer: Vec<u8>
 }
 
 impl BlockDevice for FileStorageDebug {
     fn read_blocks(&self, offset: usize, number: usize) ->Vec<u8> {
         if self.file_buffer.len() >= (offset + number) * self.block_size() {
-            let mut buf: Vec<u8> = Vec::new();
-            buf.reserve(number * self.block_size());
+            let mut buf: Vec<u8> = Vec::with_capacity(number * self.block_size());
             for b in self.file_buffer[(offset * self.block_size())..((offset + number) * self.block_size())].iter() {
                 buf.push(*b);
             }

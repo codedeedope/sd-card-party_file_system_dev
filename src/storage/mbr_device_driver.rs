@@ -1,57 +1,32 @@
-//use super::block_device::BlockDevice;
+use super::block_device::BlockDevice;
+use super::partition::Partition;
+
+use collections::vec::Vec;
 
 //offsets in bytes
-const MBR_PARTITION_TABLE_OFFSET: usize = 0x01BE;
-const PARTITION_TABLE_CHS_FIRST_SECTOR_OFFSET: usize = 0x01;
-const PARTITION_TABLE_TYPE_OFFSET: usize = 0x04;
-const PARTITION_TABLE_CHS_LAST_SECTOR_OFFSET: usize = 0x05;
+const PARTITION_TABLE_OFFSET: usize = 0x01BE;
 
-pub struct MbrDeviceDriver {
+pub struct MbrDeviceDriver<'a> {
+    block_device: &'a BlockDevice,
     mbr: Vec<u8>
 }
 
-impl MbrDeviceDriver {
-    pub fn new(mbr: Vec<u8>) -> MbrDeviceDriver { //blockDevice reference input
-        if mbr.len() != 512 {
-            panic!("mbr not valid");
-        } else {
-            MbrDeviceDriver {
-                mbr: mbr
-            }
+impl <'a> MbrDeviceDriver<'a> {
+    pub fn new(block_device: &'a BlockDevice) -> MbrDeviceDriver<'a> {
+        if block_device.block_size() != 512 {
+            panic!("512");
+        }
+        MbrDeviceDriver {
+            block_device: block_device,
+            mbr: block_device.read_blocks(0, 1)
         }
     }
 
-    //if 0x0B FAT32 ->chs must be converted to lba
-    pub fn get_first_partition_type(&self) ->u8 {
-        self.mbr[MBR_PARTITION_TABLE_OFFSET + PARTITION_TABLE_TYPE_OFFSET]
+    pub fn get_first_partition(&self) -> Partition {
+        let mut first_entry: Vec<u8> = Vec::with_capacity(16);
+        for i in 0..16 {
+            first_entry.push(self.mbr[PARTITION_TABLE_OFFSET + i]);
+        }
+        Partition::new(self.block_device, first_entry)
     }
-
-    //sector of 512 bytes
-        pub fn get_first_partition_startsector_lba(&self) ->usize {
-        let first = self.mbr[MBR_PARTITION_TABLE_OFFSET + PARTITION_TABLE_CHS_FIRST_SECTOR_OFFSET];
-        let second = self.mbr[MBR_PARTITION_TABLE_OFFSET + PARTITION_TABLE_CHS_FIRST_SECTOR_OFFSET + 1];
-        let third = self.mbr[MBR_PARTITION_TABLE_OFFSET + PARTITION_TABLE_CHS_FIRST_SECTOR_OFFSET + 2];
-
-        encoded_chs_to_lba(first, second, third)
-    }
-
-    //sector size in FAT can be different
-    pub fn get_first_partition_number_of_sectors_lba(&self) ->usize {
-        let first = self.mbr[MBR_PARTITION_TABLE_OFFSET + PARTITION_TABLE_CHS_LAST_SECTOR_OFFSET];
-        let second = self.mbr[MBR_PARTITION_TABLE_OFFSET + PARTITION_TABLE_CHS_LAST_SECTOR_OFFSET + 1];
-        let third = self.mbr[MBR_PARTITION_TABLE_OFFSET + PARTITION_TABLE_CHS_LAST_SECTOR_OFFSET + 2];
-
-        self.get_first_partition_startsector_lba() - encoded_chs_to_lba(first, second, third) + 1
-    }
-}
-
-fn encoded_chs_to_lba(first: u8, second: u8, third: u8) -> usize {
-    let c: usize = (((second & 0b1100_0000_u8) as usize) << 2) | (third as usize);
-    let h: usize = first as usize;
-    let s: usize =  (second & 0b0011_1111_u8) as usize;
-
-    //LBA = ( (cylinder * heads_per_cylinder + heads ) * sectors_per_track ) + sector - 1
-    //This allowed addressing 256 heads, 1024 cylinders per head and 64 sectors per cylinder
-    //(In practice, the number 0 for each is not used.) 
-    (((c * 256 + h) + 64) + s - 1)
 }
