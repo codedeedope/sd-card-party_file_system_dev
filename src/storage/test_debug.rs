@@ -28,7 +28,9 @@ pub fn test() {
     //let fs: usize = mbr_device_triver.get_first_partition_startsector_lba();
     //let ns: usize = mbr_device_triver.get_first_partition_number_of_sectors_lba();
 
-    let pt = mbr_device_driver.get_first_partition().get_partition_type();
+    let pt = mbr_device_driver
+        .get_first_partition()
+        .get_partition_type();
 
     let opt: Option<char> = char::from_u32(pt as u32); //from collections?
     let ch = match opt {
