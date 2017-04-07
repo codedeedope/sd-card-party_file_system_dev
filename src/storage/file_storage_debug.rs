@@ -40,7 +40,7 @@ impl FileStorageDebug {
         }
     }
 
-    pub fn len() ->usize {
-        file_buffer.len()
+    pub fn len(&self) ->usize {
+        self.file_buffer.len()
     }
 }

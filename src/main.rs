@@ -1,4 +1,5 @@
 mod storage;
+use storage::test_debug::*;
 
 /*
 #![feature(core)]
@@ -9,9 +10,9 @@ use collections::vec::*;
 */
 
 //slices: Prefer over owned type if only immutable access is needed
-
 //test mc code language core features with mc project
+//clippy!!!
 
 fn main() {
-    storage::test_debug::test();
+    test();
 }
