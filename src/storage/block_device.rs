@@ -5,7 +5,7 @@ pub trait BlockDevice {
     ///     get_data(...) shall return an vector with all blocks till the end
     /// read_blocks(...).len() % block_size() == 0 must always be true
     fn read_blocks(&self, offset: usize, number: usize) ->Vec<u8>;
-    //unimplemented!()
+    /// unimplemented!()
     fn write_blocks(&self, offset: usize, blocks: Vec<u8>) -> Result<usize, ()>;
     fn number_of_blocks(&self) -> usize;
     /// block_size should be 512 byte

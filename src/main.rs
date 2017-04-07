@@ -1,4 +1,5 @@
 #![feature(collections)]
+//#![allow(dead_code)] //tmp
 
 mod storage;
 use storage::test_debug::*;

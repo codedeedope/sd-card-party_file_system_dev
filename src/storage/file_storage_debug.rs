@@ -35,7 +35,6 @@ impl BlockDevice for FileStorageDebug {
     }
 } 
 
-//#[allow(match_wild_err_arm)] //clippy
 impl FileStorageDebug {
     pub fn new(path: &Path) ->FileStorageDebug {
         let mut file = match File::open(path) {
