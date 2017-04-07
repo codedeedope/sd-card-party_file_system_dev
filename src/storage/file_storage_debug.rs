@@ -1,4 +1,4 @@
-use super::storage_device::StorageDevice;
+use super::block_device::BlockDevice;
 
 use std::fs::File;
 use std::io::Read;
@@ -8,12 +8,12 @@ pub struct FileStorageDebug {
     file_buffer: Vec<u8>,
 }
 
-impl StorageDevice for FileStorageDebug {
-    fn read(&self, offset: usize, number: usize) ->Vec<u8> {
-        if self.file_buffer.len() >= offset + number {
+impl BlockDevice for FileStorageDebug {
+    fn read_blocks(&self, offset: usize, number: usize) ->Vec<u8> {
+        if self.file_buffer.len() >= (offset + number) * 512 {
             let mut buf: Vec<u8> = Vec::new();
-            buf.reserve(number);
-            for b in self.file_buffer[offset..(offset + number)].iter() {
+            buf.reserve(number * 512);
+            for b in self.file_buffer[(offset * 512)..((offset + number) * 512)].iter() {
                 buf.push(*b);
             }
             buf

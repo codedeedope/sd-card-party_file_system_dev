@@ -6,5 +6,6 @@ pub trait BlockDevice {
     /// if (offset + number) *512 is larger than the last address,
     /// get_data shall return an vector with all bytes till the end
     /// read_blocks(...).len() % 512 == 0 must always be true
+    /// implementation could use Vec::reserve_exact(...)
     fn read_blocks(&self, offset: usize, number: usize) ->Vec<u8>;
 }
