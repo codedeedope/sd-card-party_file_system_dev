@@ -22,6 +22,7 @@ impl<'a> MbrDeviceDriver<'a> {
         }
     }
 
+    // shouldn't be created every time
     pub fn get_first_partition(&self) -> Partition {
         let mut first_entry: Vec<u8> = Vec::with_capacity(16);
         for i in 0..16 {

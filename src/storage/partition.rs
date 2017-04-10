@@ -4,9 +4,11 @@ use collections::vec::Vec;
 
 //sector here is just another name for block
 
-const CHS_FIRST_SECTOR_OFFSET: usize = 0x01;
+//const CHS_FIRST_SECTOR_OFFSET: usize = 0x01;
 const TYPE_OFFSET: usize = 0x04;
-const CHS_LAST_SECTOR_OFFSET: usize = 0x05;
+//const CHS_LAST_SECTOR_OFFSET: usize = 0x05;
+const LBA_FIRST_SECTOR_OFFSET: usize = 0x08; //partition_entry[0x0B] must be valid
+const LBA_NUMBER_OF_SECTORS_OFFSET: usize = 0x0C;
 
 pub struct Partition<'a> {
     block_device: &'a BlockDevice,
@@ -16,25 +18,17 @@ pub struct Partition<'a> {
 }
 
 impl<'a> Partition<'a> {
-    pub fn new(block_device: &'a BlockDevice, partition: Vec<u8>) -> Partition<'a> {
-        if partition.len() != 16 {
+    // partition_entry could be a reference
+    pub fn new(block_device: &'a BlockDevice, partition_entry: Vec<u8>) -> Partition<'a> {
+        if partition_entry.len() != 16 {
             panic!("16");
         }
 
-        let partition_type = partition[TYPE_OFFSET];
-        let start_sector_lba = encoded_chs_to_lba(partition[CHS_FIRST_SECTOR_OFFSET],
-                                                  partition[CHS_FIRST_SECTOR_OFFSET + 1],
-                                                  partition[CHS_FIRST_SECTOR_OFFSET + 2]);
-        let last_sector_lba = encoded_chs_to_lba(partition[CHS_LAST_SECTOR_OFFSET],
-                                                 partition[CHS_LAST_SECTOR_OFFSET + 1],
-                                                 partition[CHS_LAST_SECTOR_OFFSET + 2]);
-        let number_of_sectors_lba = last_sector_lba - start_sector_lba + 1;
-
         Partition {
             block_device: block_device,
-            partition_type: partition_type,
-            start_sector_lba: start_sector_lba,
-            number_of_sectors_lba: number_of_sectors_lba,
+            partition_type: partition_entry[TYPE_OFFSET],
+            start_sector_lba: four_bytes_at_offset(&partition_entry, LBA_FIRST_SECTOR_OFFSET),
+            number_of_sectors_lba: four_bytes_at_offset(&partition_entry, LBA_NUMBER_OF_SECTORS_OFFSET),
         }
     }
 
@@ -63,6 +57,16 @@ impl<'a> BlockDevice for Partition<'a> {
     }
 }
 
+//use unstead instead?
+fn four_bytes_at_offset(partition_entry: &Vec<u8>, offset: usize) ->usize {
+    let first: u32 = partition_entry[offset] as u32;
+    let second: u32 = partition_entry[offset + 1] as u32;
+    let third: u32 = partition_entry[offset + 2] as u32;
+    let fourth: u32 = partition_entry[offset + 3] as u32;
+    (first | second << 8 | third << 16 | fourth << 24) as usize
+}
+
+/*
 fn encoded_chs_to_lba(first: u8, second: u8, third: u8) -> usize {
     let c: usize = (((second & 0b1100_0000_u8) as usize) << 2) | (third as usize);
     let h: usize = first as usize;
@@ -71,5 +75,6 @@ fn encoded_chs_to_lba(first: u8, second: u8, third: u8) -> usize {
     //LBA = ( (cylinder * heads_per_cylinder + heads ) * sectors_per_track ) + sector - 1
     //This allowed addressing 256 heads, 1024 cylinders per head and 64 sectors per cylinder
     //(In practice, the number 0 for each is not used.)
-    (((c * 256 + h) + 64) + s - 1)
+    (((c * 255 + h) + 63) + s - 1) //wrong
 }
+*/
