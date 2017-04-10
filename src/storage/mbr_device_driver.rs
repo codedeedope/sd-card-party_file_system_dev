@@ -1,7 +1,6 @@
 use super::block_device::BlockDevice;
 use super::partition::Partition;
-
-use collections::vec::Vec;
+use collections::vec::*;
 
 //offsets in bytes
 const PARTITION_TABLE_OFFSET: usize = 0x01BE;

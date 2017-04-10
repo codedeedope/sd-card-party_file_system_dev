@@ -1,6 +1,5 @@
 use super::block_device::BlockDevice;
-
-use collections::vec::Vec;
+use collections::vec::*;
 
 //sector here is just another name for block
 

@@ -1,3 +1,5 @@
+use collections::vec::*;
+
 pub trait BlockDevice {
     /// if offset * block_size() is larger than the last address, get_data(...)
     /// shall return an empty vector

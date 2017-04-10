@@ -1,5 +1,6 @@
 use super::block_device::BlockDevice;
 use super::file::File;
+use collections::vec::*;
 
 const BYTE_PER_SECTOR_OFFSET: usize = 0x0B;
 const SECTORS_PER_CLUSTER_OFFSET: usize = 0x0D;
