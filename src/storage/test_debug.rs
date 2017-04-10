@@ -41,6 +41,7 @@ pub fn test() {
     //println!("val: {:x}", x);
     let x = mbr_device_driver.get_first_partition().read_blocks(0, 1);
     println!("{:?}", x);
-
     //Block 2048 dec
+
+    let y: &str = "hello";
 }
