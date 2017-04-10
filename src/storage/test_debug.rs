@@ -22,26 +22,10 @@ pub enum PartitionType {
 */
 
 pub fn test() {
-    let fsd = FileStorageDebug::new(Path::new("fat32.img"));
+    let fsd = FileStorageDebug::new(Path::new("storage.img"));
     let mbr_device_driver = MbrDeviceDriver::new(&fsd);
-    //let pt: u8 = mbr_device_triver.get_first_partition_type();
-    //let fs: usize = mbr_device_triver.get_first_partition_startsector_lba();
-    //let ns: usize = mbr_device_triver.get_first_partition_number_of_sectors_lba();
-
-    //let pt = mbr_device_driver
-        //.get_first_partition()
-        //.get_partition_type();
-
-    //let opt: Option<char> = char::from_u32(pt as u32); //from collections?
-    //let ch = match opt {
-        //None => '$',
-        //Some(c) => c,
-    //};
-    //let x = ch as u32;
-    //println!("val: {:x}", x);
-    let x = mbr_device_driver.get_first_partition().read_blocks(0, 1);
-    println!("{:?}", x);
-    //Block 2048 dec
+    //let x = mbr_device_driver.get_first_partition().read_blocks(0, 1);
+    //println!("{:?}", x);
 
     let y: &str = "hello";
 }

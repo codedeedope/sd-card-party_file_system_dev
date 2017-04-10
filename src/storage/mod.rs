@@ -1,5 +1,7 @@
 pub mod block_device;
+pub mod fat32_device_driver;
 pub mod file_storage_debug; //dbg
+pub mod file;
 pub mod mbr_device_driver;
 pub mod partition;
 pub mod test_debug; //dbg
