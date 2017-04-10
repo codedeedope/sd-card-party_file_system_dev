@@ -17,7 +17,8 @@ use collections::vec::*;
 //use asserts instead of if ... {panic!(...)} !!!
 //slices: Prefer over owned type if only immutable access is needed
 //test mc code language core features with mc project
-//clippy!!!
+//file is BlockDevice
+//A concrete BlockDevice type for offset?
 
 fn main() {
     test();

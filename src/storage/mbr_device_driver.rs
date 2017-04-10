@@ -13,7 +13,7 @@ pub struct MbrDeviceDriver<'a> {
 
 impl<'a> MbrDeviceDriver<'a> {
     pub fn new(block_device: &'a BlockDevice) -> MbrDeviceDriver<'a> {
-        if block_device.block_size() != 512 {
+        if !(block_device.block_size() >= 512 && block_device.block_size() % 512 == 0) {
             panic!("512");
         }
         MbrDeviceDriver {
