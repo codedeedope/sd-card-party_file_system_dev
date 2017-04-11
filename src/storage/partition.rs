@@ -1,4 +1,5 @@
 use super::block_device::BlockDevice;
+use super::get_bytes::*;
 use collections::vec::*;
 
 //sector here is just another name for block
@@ -26,8 +27,8 @@ impl<'a> Partition<'a> {
         Partition {
             block_device: block_device,
             partition_type: partition_entry[TYPE_OFFSET],
-            start_sector_lba: four_bytes_at_offset(&partition_entry, LBA_FIRST_SECTOR_OFFSET),
-            number_of_sectors_lba: four_bytes_at_offset(&partition_entry, LBA_NUMBER_OF_SECTORS_OFFSET),
+            start_sector_lba: four_bytes_at_offset(&partition_entry, LBA_FIRST_SECTOR_OFFSET) as usize,
+            number_of_sectors_lba: four_bytes_at_offset(&partition_entry, LBA_NUMBER_OF_SECTORS_OFFSET) as usize,
         }
     }
 
@@ -38,6 +39,7 @@ impl<'a> Partition<'a> {
 
 impl<'a> BlockDevice for Partition<'a> {
     fn read_blocks(&self, offset: usize, number: usize) -> Vec<u8> {
+        println!("start_sector_lba: {:?}", self.start_sector_lba);
         self.block_device
             .read_blocks(self.start_sector_lba + offset, number)
     }
@@ -54,15 +56,6 @@ impl<'a> BlockDevice for Partition<'a> {
     fn block_size(&self) -> usize {
         self.block_device.block_size()
     }
-}
-
-//use unstead instead?
-fn four_bytes_at_offset(partition_entry: &Vec<u8>, offset: usize) ->usize {
-    let first: u32 = partition_entry[offset] as u32;
-    let second: u32 = partition_entry[offset + 1] as u32;
-    let third: u32 = partition_entry[offset + 2] as u32;
-    let fourth: u32 = partition_entry[offset + 3] as u32;
-    (first | second << 8 | third << 16 | fourth << 24) as usize
 }
 
 /*

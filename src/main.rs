@@ -18,7 +18,7 @@ use collections::vec::*;
 //slices: Prefer over owned type if only immutable access is needed
 //A concrete BlockDevice type for offset?
 //check if compileable in microcontroller project!
-//put file in root directory?
+//tuple ->which size??
 
 fn main() {
     test();

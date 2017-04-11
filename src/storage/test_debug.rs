@@ -1,6 +1,7 @@
 use super::file_storage_debug::*;
 use super::mbr_device_driver::*;
 use super::block_device::*;
+use super::fat32_device_driver::*;
 
 use std::path::Path;
 use std::char;
@@ -26,6 +27,9 @@ pub fn test() {
     let mbr_device_driver = MbrDeviceDriver::new(&fsd);
     //let x = mbr_device_driver.get_first_partition().read_blocks(0, 1);
     //println!("{:?}", x);
-
-    let y: &str = "hello";
+    //let y: &str = "hello";
+    let partition = mbr_device_driver.get_first_partition();
+    let fat32_device_driver = Fat32DeviceDriver::new(&partition);
+    let root = fat32_device_driver.read_root_directory();
+    //println!("root: {:?}", root);
 }
