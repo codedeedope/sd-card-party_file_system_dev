@@ -31,5 +31,7 @@ pub fn test() {
     let partition = mbr_device_driver.get_first_partition();
     let fat32_device_driver = Fat32DeviceDriver::new(&partition);
     let root = fat32_device_driver.read_root_directory();
-    //println!("root: {:?}", root);
+    println!("root: {:?}", root);
+
+    //morgen: Doku für Präsentation
 }
