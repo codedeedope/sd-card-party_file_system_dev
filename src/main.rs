@@ -14,12 +14,6 @@ extern crate collections;
 use collections::vec::*;
 */
 
-//use asserts instead of if ... {panic!(...)} !!!
-//slices: Prefer over owned type if only immutable access is needed
-//A concrete BlockDevice type for offset?
-//check if compileable in microcontroller project!
-//tuple ->which size??
-
 fn main() {
     test();
 }

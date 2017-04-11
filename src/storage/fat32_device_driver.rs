@@ -1,5 +1,5 @@
 use super::block_device::BlockDevice;
-use super::file::File;
+use super::directory_entry::DirectoryEntry;
 use super::get_bytes::*;
 use collections::vec::*;
 
@@ -12,11 +12,25 @@ const NUMBER_OF_SECTORS_PER_FAT_OFFSET: usize = 0x024;
 const CLUSTER_NUMBER_ROOT_DIRECTORY_OFFSET: usize = 0x02C;
 
 /*
+dbg:
+in the file:
+2048 :partition
+(2048 + 32) * 512 = 1064960 :FAT (table-entries)
+(2048 + 4022) * 512 = 3107840 :first cluster (data)
+*/
+
+/*
 cluster chain:
 next cluster:
 0x?0000002 - 0x?FFFFFEF
 not: end of cluster-chain (not standard)
 */
+
+//Searches for directory-entry of name <>, put the clusters together and returns a "DirectoryEntry"
+//--will be hardcoded first
+//which can be a file or a directory
+//and can be free or not
+//->make a cluster of them? ->nope, break at first free
 
 pub struct Fat32DeviceDriver<'a> {
     block_device: &'a BlockDevice,
@@ -68,6 +82,38 @@ impl<'a> Fat32DeviceDriver<'a> {
             data_region_block_offset: data_region_block_offset,
             root_directory_cluster_offset: root_directory_cluster_offset,
         }
+    }
+
+    /// dbg test
+    /// only one file in root
+    /// only one cluster per file
+    /// only short names
+    pub fn read_first_file_to_vec(&self) ->Vec<u8> {
+        let file = self.first_file_directory_entry();
+        let mut full = self.read_cluster_data_region(file.first_cluster());
+        println!("0: {:0}", file.first_cluster());
+        println!("1: {:0}", file.file_size());
+        println!("2: {:0}", full.len());
+//        full.split_off(file.file_size());
+        full
+    }
+
+    fn first_file_directory_entry(&self) ->DirectoryEntry {
+        let root = self.read_root_directory();
+        let number: usize = root.len() / 32;
+        println!("number: {:?}", number);
+        for i in 0..number {
+            println!("i: {:?}", i);
+            let mut directory_entry = Vec::with_capacity(32);
+            for j in 0..32 {
+                directory_entry.push(root[i * 32 + j]);
+            }
+            let dir_entr = DirectoryEntry::new(&directory_entry);
+            if dir_entr.is_file() {
+                return dir_entr;
+            }
+        }
+        panic!("no file here");
     }
 
     pub fn read_root_directory(&self) -> Vec<u8> {

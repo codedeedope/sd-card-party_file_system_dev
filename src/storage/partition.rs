@@ -19,6 +19,7 @@ pub struct Partition<'a> {
 
 impl<'a> Partition<'a> {
     // partition_entry could be a reference
+    // note: start_sector_lba is the offset on block_device
     pub fn new(block_device: &'a BlockDevice, partition_entry: Vec<u8>) -> Partition<'a> {
         if partition_entry.len() != 16 {
             panic!("16");
