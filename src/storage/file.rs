@@ -6,10 +6,8 @@ pub struct File {
 }
 
 impl File {
-    pub fn new() ->File {
-        File {
-            //
-        }
+    pub fn new() -> File {
+        File {}
     }
 }
 

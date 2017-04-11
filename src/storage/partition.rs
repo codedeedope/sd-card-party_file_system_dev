@@ -27,8 +27,11 @@ impl<'a> Partition<'a> {
         Partition {
             block_device: block_device,
             partition_type: partition_entry[TYPE_OFFSET],
-            start_sector_lba: four_bytes_at_offset(&partition_entry, LBA_FIRST_SECTOR_OFFSET) as usize,
-            number_of_sectors_lba: four_bytes_at_offset(&partition_entry, LBA_NUMBER_OF_SECTORS_OFFSET) as usize,
+            start_sector_lba: four_bytes_at_offset(&partition_entry, LBA_FIRST_SECTOR_OFFSET) as
+                              usize,
+            number_of_sectors_lba: four_bytes_at_offset(&partition_entry,
+                                                        LBA_NUMBER_OF_SECTORS_OFFSET) as
+                                   usize,
         }
     }
 
@@ -39,7 +42,6 @@ impl<'a> Partition<'a> {
 
 impl<'a> BlockDevice for Partition<'a> {
     fn read_blocks(&self, offset: usize, number: usize) -> Vec<u8> {
-        println!("start_sector_lba: {:?}", self.start_sector_lba);
         self.block_device
             .read_blocks(self.start_sector_lba + offset, number)
     }
