@@ -20,7 +20,7 @@ impl<'a> MbrDeviceDriver<'a> {
         for i in 0..16 {
             first_entry.push(mbr[PARTITION_TABLE_OFFSET + i]);
         }
-        let first_partition = Partition::new(block_device, first_entry);
+        let first_partition = Partition::new(block_device, &first_entry);
 
         MbrDeviceDriver {
             first_partition: first_partition,

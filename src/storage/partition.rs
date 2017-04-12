@@ -2,37 +2,35 @@ use super::block_device::BlockDevice;
 use super::get_bytes::*;
 use collections::vec::*;
 
-//sector here is just another name for block
-
 //const CHS_FIRST_SECTOR_OFFSET: usize = 0x01;
 const TYPE_OFFSET: usize = 0x04;
 //const CHS_LAST_SECTOR_OFFSET: usize = 0x05;
-const LBA_FIRST_SECTOR_OFFSET: usize = 0x08; //partition_entry[0x0B] must be valid
+const LBA_FIRST_SECTOR_OFFSET: usize = 0x08;
 const LBA_NUMBER_OF_SECTORS_OFFSET: usize = 0x0C;
 
 pub struct Partition<'a> {
     block_device: &'a BlockDevice,
     partition_type: u8,
-    start_sector_lba: usize,
-    number_of_sectors_lba: usize,
+    start_block: usize,
+    block_count: usize,
 }
 
 impl<'a> Partition<'a> {
-    // partition_entry could be a reference
-    // note: start_sector_lba is the offset on block_device
-    pub fn new(block_device: &'a BlockDevice, partition_entry: Vec<u8>) -> Partition<'a> {
+    // note: start_block is the offset on block_device
+    pub fn new(block_device: &'a BlockDevice, partition_entry: &Vec<u8>) -> Partition<'a> {
         if partition_entry.len() != 16 {
             panic!("16");
         }
 
+        let partition_type = partition_entry[TYPE_OFFSET];
+        let start_block = four_bytes_at_offset(partition_entry, LBA_FIRST_SECTOR_OFFSET) as usize; //[sic!]
+        let block_count = four_bytes_at_offset(partition_entry, LBA_NUMBER_OF_SECTORS_OFFSET) as usize;
+
         Partition {
             block_device: block_device,
-            partition_type: partition_entry[TYPE_OFFSET],
-            start_sector_lba: four_bytes_at_offset(&partition_entry, LBA_FIRST_SECTOR_OFFSET) as
-                              usize,
-            number_of_sectors_lba: four_bytes_at_offset(&partition_entry,
-                                                        LBA_NUMBER_OF_SECTORS_OFFSET) as
-                                   usize,
+            partition_type: partition_type,
+            start_block: start_block,
+            block_count: block_count,
         }
     }
 
@@ -43,8 +41,7 @@ impl<'a> Partition<'a> {
 
 impl<'a> BlockDevice for Partition<'a> {
     fn read_blocks(&self, offset: usize, number: usize) -> Vec<u8> {
-        self.block_device
-            .read_blocks(self.start_sector_lba + offset, number)
+        self.block_device.read_blocks(self.start_block + offset, number)
     }
 
     #[allow(unused_variables)]
@@ -53,7 +50,7 @@ impl<'a> BlockDevice for Partition<'a> {
     }
 
     fn number_of_blocks(&self) -> usize {
-        self.number_of_sectors_lba
+        self.block_count
     }
 
     fn block_size(&self) -> usize {
