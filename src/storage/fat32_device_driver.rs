@@ -20,11 +20,6 @@ in the file:
 (2048 + 4022) * 512 = 3107840 :first cluster (data)
 */
 
-//(not implemented yet) Searches for directory-entry of name <>,
-//put the clusters together and returns a "DirectoryEntry"
-//--will be hardcoded first
-//can be a file or a directory and can be free or not
-
 pub struct Fat32DeviceDriver<'a> {
     block_device: &'a BlockDevice,
     block_size_sector: usize,
@@ -78,6 +73,7 @@ impl<'a> Fat32DeviceDriver<'a> {
     }
 
     /// only short name
+    /// only in root directory
     pub fn read_file_to_vec(&self, name_extension: &str) -> Option<Vec<u8>> {
         let opt_file = self.file_directory_entry(name_extension);
         let file = match opt_file {
@@ -101,11 +97,10 @@ impl<'a> Fat32DeviceDriver<'a> {
         all
     }
 
-    /// change!!
     fn file_directory_entry(&self, name_extension: &str) -> Option<DirectoryEntry> {
         let root = self.read_root_directory();
         let number: usize = root.len() / 32;
-        // better: implement check is_last_entry
+        // better: implement check is_last_entry and break
         for i in 0..number {
             let mut directory_entry = Vec::with_capacity(32);
             for j in 0..32 {
@@ -119,7 +114,7 @@ impl<'a> Fat32DeviceDriver<'a> {
         None
     }
 
-    pub fn read_root_directory(&self) -> Vec<u8> {
+    fn read_root_directory(&self) -> Vec<u8> {
         self.read_cluster_data_region(self.root_directory_cluster_offset)
     }
 

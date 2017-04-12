@@ -1,4 +1,3 @@
-#![feature(core)]
 #![feature(collections)]
 //#![allow(dead_code)] //tmp
 
