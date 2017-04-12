@@ -87,18 +87,17 @@ impl<'a> Fat32DeviceDriver<'a> {
     /// dbg test
     /// only one file in root
     /// only one cluster per file
-    /// only short names
-    pub fn read_first_file_to_vec(&self) ->Vec<u8> {
+    pub fn read_first_file_to_vec(&self) -> Vec<u8> {
         let file = self.first_file_directory_entry();
         let mut full = self.read_cluster_data_region(file.first_cluster());
         println!("0: {:0}", file.first_cluster());
         println!("1: {:0}", file.file_size());
         println!("2: {:0}", full.len());
-//        full.split_off(file.file_size());
+        full.split_off(file.file_size());
         full
     }
 
-    fn first_file_directory_entry(&self) ->DirectoryEntry {
+    fn first_file_directory_entry(&self) -> DirectoryEntry {
         let root = self.read_root_directory();
         let number: usize = root.len() / 32;
         println!("number: {:?}", number);
@@ -133,7 +132,8 @@ impl<'a> Fat32DeviceDriver<'a> {
         //- 2 because the first two cluster-entries in the FAT are reserved
         //and dont represent clusters in the data section
         self.block_device
-            .read_blocks(self.data_region_block_offset + (cluster_entry_offset - 2) * self.block_size_cluster,
+            .read_blocks(self.data_region_block_offset +
+                         (cluster_entry_offset - 2) * self.block_size_cluster,
                          self.block_size_cluster)
     }
 }

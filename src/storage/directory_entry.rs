@@ -44,7 +44,19 @@ impl DirectoryEntry {
         let no_name = directory_entry[NAME_OFFSET];
         println!("no_name:{:x}", no_name);
         //check longname entry!!
-        if attr == 0x10 || attr == 0x08 || attr == 0 {
+
+        let mut is_volume_id = false;
+        let mut is_directory = false;
+
+        if attr & 0x08 != 0 {
+            is_volume_id = true;
+        }
+
+        if attr & 0x10 != 0 {
+            is_directory = true;
+        }
+
+        if is_volume_id || is_directory {
             is_file = false;
         } else if no_name == 0xE5 || no_name == 0 {
             is_file = false;
@@ -59,15 +71,15 @@ impl DirectoryEntry {
         }
     }
 
-    pub fn first_cluster(&self) ->usize {
+    pub fn first_cluster(&self) -> usize {
         self.first_cluster_entry_number
     }
 
-    pub fn is_file(&self) ->bool {
+    pub fn is_file(&self) -> bool {
         self.is_file
     }
 
-    pub fn file_size(&self) ->usize {
+    pub fn file_size(&self) -> usize {
         self.file_size
     }
 }
