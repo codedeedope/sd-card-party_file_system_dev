@@ -1,4 +1,4 @@
-use super::block_device::BlockDevice;
+use block_device::BlockDevice;
 use super::get_bytes::*;
 use collections::vec::*;
 
