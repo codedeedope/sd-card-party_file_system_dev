@@ -57,6 +57,9 @@ impl<'a> Fat32DeviceDriver<'a> {
                                        number_of_reserved_blocks;
         let root_directory_cluster_offset = cluster_number_root_directory;
 
+        println!("data_region_block_offset: {0:08.x}", data_region_block_offset);
+        println!("root_directory_cluster_offset: {0:08.x}", root_directory_cluster_offset);
+
         Fat32DeviceDriver {
             block_device: block_device,
             block_size_cluster: block_size_cluster,
@@ -75,8 +78,11 @@ impl<'a> Fat32DeviceDriver<'a> {
             Some(f) => f,
             None => return None,
         };
+        println!("file.first_cluster: {0:08.x}", file.first_cluster());
+        println!("file.name_extension: {:?}", file.name_extension());
         let mut full = self.compile_clusters_begin_with_number(file.first_cluster());
         full.split_off(file.file_size());
+        println!("file.file_size: {0:08.x}", full.len());
         Some(full)
     }
 
@@ -86,7 +92,7 @@ impl<'a> Fat32DeviceDriver<'a> {
         let mut current_offset = offset;
         //[0x?0000002; 0x?FFFFFF6] //max should be calculated first
         while (current_offset & 0x0FFFFFFF) >= 0x2 && (current_offset & 0x0FFFFFFF) <= 0xFFFFFF6 {
-            //println!("current_offset: {0:08.x}", current_offset);
+            println!("current_cluster: {0:08.x}", current_offset);
             all.append(&mut self.read_cluster_data_region(current_offset));
             current_offset = self.read_in_fat(current_offset);
         }

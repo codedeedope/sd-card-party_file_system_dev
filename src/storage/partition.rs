@@ -27,6 +27,8 @@ impl<'a> Partition<'a> {
         let block_count = four_bytes_at_offset(partition_entry, LBA_NUMBER_OF_SECTORS_OFFSET) as
                           usize;
 
+        println!("partition_start_block: {:0}", start_block);
+
         Partition {
             block_device: block_device,
             partition_type: partition_type,

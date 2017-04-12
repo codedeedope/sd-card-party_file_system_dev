@@ -1,6 +1,7 @@
 use super::file_storage_debug::*;
 use super::mbr_device_driver::*;
 use super::fat32_device_driver::*;
+use block_device::*;
 
 use std::path::Path;
 use std::string::*;
@@ -16,6 +17,7 @@ use std::string::*;
 
 pub fn test() {
     let fsd = FileStorageDebug::new(Path::new("storage.img"));
+    println!("block_size: {:0}", fsd.block_size());
     let mbr_device_driver = MbrDeviceDriver::new(&fsd);
     let partition = mbr_device_driver.get_first_partition();
 
