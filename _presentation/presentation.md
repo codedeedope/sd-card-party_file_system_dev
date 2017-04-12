@@ -1,46 +1,61 @@
-% SD Card Party
-% DMA Transfers, Dateisystemzugriff und SD Initialisierung
-% Christoffer Anselm, Fabian Hinderer, Clara Scherer
+# Dateisystemzugriff: Datei im FAT32 Root-Directory auslesen
+
+## Datenträgerinhalt
+
+- MBR
+	- ...
+	- Partitionstabelle
+	- ...
+- ...
+- erste Partition
+	- FAT32 Dateisystem
+		- Metadaten
+		- FAT -> u32 Liste; Einträge stehen für Cluster in den
+		- Nutzdaten
+- ...
 
 
+## Modellierung
 
-# Showcase
+- BlockDevice (Trait)
+	- abstrahiert Datenzugriff
+	- read_blocks(..), number_of_blocks(..), block_size(..)
 
-# SD Initialisierung
+- MbrDeviceDriver
+	- Zugriff: BlockDevice
+	- liefert: erste Partition
 
-## SdHandle
+- Partition
+	- ist: BlockDevice
+	- hat: Dateisystemtyp
 
-[//]: ![](SdHandle.png)\
+- Fat32DeviceDriver
+	- Zugriff: BlockDevice
+	- liefert: Datei (Vec)
 
+## Fat32DeviceDriver Dateizugriff
 
-## CardInfo
+1. Metadaten liefern: erster Cluster vom Root-Directory
 
-[//]: ![](CardInfo.png)\
+1. Einträge dort enthalten: is_file, name_extension, first_cluster
 
+1. Damit: FAT Clusterkette durchlaufen und
 
-## Hardware initialisieren
+1. entsprechende Cluster in den Nutzdaten konkatenieren (Vec)
 
-- GPIO Pins per Alternate Function setzen
-	- SDMMC Clock
-	- SDMMC Command
-	- SDMMC Data
+## Verwendung Codebeispiel
 
-- Clock initialisieren und anschalten
-
-- Power On
-
-- Initialisierung der SD Karte
-
-## SD Karte initialisieren
-
-[//]: ![](Initialization.png)\
-
-
-## Benutzung
-
-- DmaManager initialisieren $\rightarrow$ dma::DmaManager::init_dma2(dma_2, rcc);
-- neues SdHandle struct erzeugen $\rightarrow$ sd::SdHandle::new(sdmmc, &dma_2, &mut sdram_addr);
-- SdHandle initialisieren $\rightarrow$ sd_handle.init(&mut gpio, rcc);
-
-[//]: ![](Benutzung.png)\
+| let mbr_device_driver = MbrDeviceDriver::new(&**block_device**);
+| let partition = mbr_device_driver.get_first_partition();
+| if partition.get_partition_type() != 0x0B {
+| 		panic!("not FAT32");
+| }
+| let fat32_device_driver = Fat32DeviceDriver::new(partition);
+| let file_vec = fat32_device_driver.read_file_to_vec("tst.txt");
+| if file_vec.is_some() {
+| 		let file = String::from_utf8(file_vec.unwrap()).unwrap();
+| 		println!("{:?}", file);
+| } else {
+| 		println!("file not found");
+| }
 

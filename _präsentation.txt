@@ -1,19 +1,8 @@
-->Auch Repo auf Stick
-+Code: was war interessant, schwierig
-->Zeilen merken oder Folie
-Module
+Erst 10 min Implementierung
+Dann  5 min Showcase
 
-Folien pdf
-markdown + pandoc
-
-ganz schnell!
-10 min Implementierung
-5 min Showcase
-insgesamt
-
-
-->neue Storage, Stick!
 Einmal ausprobieren!
+
 davor:
 Terminal in ...file_sytem_dev öffnen
 sh run.sh
