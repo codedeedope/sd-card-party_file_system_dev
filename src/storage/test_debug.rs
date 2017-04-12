@@ -10,6 +10,9 @@ use std::string::*;
 //slices: Prefer over owned type if only immutable access is needed
 //A concrete BlockDevice type for offset?
 //tuple ->which size??
+//data to sdram; sdram handle
+//buffer
+//decrease block_size ->global const in block_device?
 
 pub fn test() {
     let fsd = FileStorageDebug::new(Path::new("storage.img"));
@@ -28,10 +31,4 @@ pub fn test() {
     } else {
         println!("file not found");
     }
-
-    //push to main repository
-    //prompt metadata?!
-    //data to sdram; sdram handle
-    //buffer
-    //decrease block_size ->global const in block_device?
 }
