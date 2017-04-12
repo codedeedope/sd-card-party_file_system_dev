@@ -25,8 +25,13 @@ pub fn test() {
     }
 
     let fat32_device_driver = Fat32DeviceDriver::new(&partition);
-    let file = String::from_utf8(fat32_device_driver.read_first_file_to_vec()).unwrap();
-    //println!("{:?}", file);
+    let file_vec = fat32_device_driver.read_file_to_vec("tst.txt");
+    if file_vec.is_some() {
+        let file = String::from_utf8(file_vec.unwrap()).unwrap();
+        println!("{:?}", file);
+    } else {
+        println!("file not found");
+    }
 
     //push to main repository
     //prompt metadata?!

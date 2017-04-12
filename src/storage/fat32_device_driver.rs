@@ -2,6 +2,7 @@ use super::block_device::BlockDevice;
 use super::directory_entry::DirectoryEntry;
 use super::get_bytes::*;
 use collections::vec::*;
+use core::option::*;
 
 //number of used bytes?!!
 const BYTE_PER_SECTOR_OFFSET: usize = 0x0B;
@@ -39,7 +40,7 @@ impl<'a> Fat32DeviceDriver<'a> {
     /// Partition::get_partition_type() == 0x0B has to be checked bevore
     pub fn new(block_device: &'a BlockDevice) -> Fat32DeviceDriver<'a> {
         if !(block_device.block_size() >= 512 && block_device.block_size() % 512 == 0) {
-            panic!("wrong block_size()");
+            panic!("wrong block_size");
         }
         let block = block_device.read_blocks(0, 1);
 
@@ -64,8 +65,6 @@ impl<'a> Fat32DeviceDriver<'a> {
                                        number_of_reserved_blocks;
         let root_directory_cluster_offset = cluster_number_root_directory;
 
-        //println!("block_size_cluster: {:0}", block_size_cluster);
-
         Fat32DeviceDriver {
             block_device: block_device,
             block_size_sector: block_size_sector,
@@ -78,16 +77,16 @@ impl<'a> Fat32DeviceDriver<'a> {
         }
     }
 
-    /// dbg test
-    /// first file in root
-    /// only one cluster per file
-    /// long name not implemented yet
-    pub fn read_first_file_to_vec(&self) -> Vec<u8> {
-        let file = self.first_file_directory_entry();
-        println!("file_size: {:0}", file.file_size());
+    /// only short name
+    pub fn read_file_to_vec(&self, name_extension: &str) -> Option<Vec<u8>> {
+        let opt_file = self.file_directory_entry(name_extension);
+        let file = match opt_file {
+            Some(f) => f,
+            None => return None,
+        };
         let mut full = self.compile_clusters_begin_with_number(file.first_cluster());
         full.split_off(file.file_size());
-        full
+        Some(full)
     }
 
     fn compile_clusters_begin_with_number(&self, offset: usize) -> Vec<u8> {
@@ -95,30 +94,29 @@ impl<'a> Fat32DeviceDriver<'a> {
         let mut current_offset = offset;
         //[0x?0000002; 0x?FFFFFF6] //max should be calculated first
         while (current_offset & 0x0FFFFFFF) >= 0x2 && (current_offset & 0x0FFFFFFF) <= 0xFFFFFF6 {
-            println!("current_offset: {0:08.x}", current_offset);
+            //println!("current_offset: {0:08.x}", current_offset);
             all.append(&mut self.read_cluster_data_region(current_offset));
             current_offset = self.read_in_fat(current_offset);
         }
         all
     }
 
-    fn first_file_directory_entry(&self) -> DirectoryEntry {
+    /// change!!
+    fn file_directory_entry(&self, name_extension: &str) -> Option<DirectoryEntry> {
         let root = self.read_root_directory();
         let number: usize = root.len() / 32;
-        //println!("number: {:?}", number);
         // better: implement check is_last_entry
         for i in 0..number {
-            println!("i: {:?}", i);
             let mut directory_entry = Vec::with_capacity(32);
             for j in 0..32 {
                 directory_entry.push(root[i * 32 + j]);
             }
             let dir_entr = DirectoryEntry::new(&directory_entry);
-            if dir_entr.is_file() {
-                return dir_entr;
+            if dir_entr.is_file() && dir_entr.name_extension() == name_extension {
+                return Some(dir_entr);
             }
         }
-        panic!("no file here");
+        None
     }
 
     pub fn read_root_directory(&self) -> Vec<u8> {

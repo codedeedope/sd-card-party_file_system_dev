@@ -13,7 +13,6 @@ const FILE_SIZE_OFFSET: usize = 28; //4
 //  should be a handle, that knows the mbr driver (?)
 /// just a simple container
 /// can represent a file or a directory
-/// unfinished!!!
 pub struct DirectoryEntry {
     name_extension: String,
     is_file: bool,
@@ -26,14 +25,6 @@ impl DirectoryEntry {
         if directory_entry.len() != 32 {
             panic!("32");
         }
-
-        /*
-        println!("dir len: {:?}", directory_entry.len());
-        for n in directory_entry {
-            print!("{0:02.x}", n); // !!!
-        }
-        println!("");
-        */
 
         let mut name_vec = Vec::with_capacity(8);
         for i in 0..8 {
@@ -53,7 +44,6 @@ impl DirectoryEntry {
             name_extension.push('.');
             name_extension.push_str(&extension);
         }
-        println!("name_extension: {:?}", name_extension);
 
         let high = two_bytes_at_offset(&directory_entry, FIRST_CLUSTER_HIGH_OFFSET) as u32;
         let low = two_bytes_at_offset(&directory_entry, FIRST_CLUSTER_LOW_OFFSET) as u32;
@@ -61,9 +51,7 @@ impl DirectoryEntry {
 
         let mut is_file = true;
         let attr = directory_entry[ATTRIBUTE_OFFSET];
-        //println!("attr: {:x}", attr);
         let no_name = directory_entry[NAME_OFFSET];
-        //println!("no_name:{:x}", no_name);
 
         let mut is_volume_id = false;
         let mut is_directory = false;
@@ -104,7 +92,7 @@ impl DirectoryEntry {
         self.file_size
     }
 
-    pub fn name_extension(&self) ->String {
-        self.name_extension.clone()
+    pub fn name_extension(&self) ->&String {
+        &self.name_extension
     }
 }

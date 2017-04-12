@@ -1,7 +1,6 @@
 use super::block_device::BlockDevice;
 use collections::vec::*;
 
-//use unsafe instead?
 pub fn four_bytes_at_offset(block: &Vec<u8>, offset: usize) -> u32 {
     let first: u32 = block[offset] as u32;
     let second: u32 = block[offset + 1] as u32;
