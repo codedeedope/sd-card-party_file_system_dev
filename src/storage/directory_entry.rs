@@ -36,7 +36,8 @@ impl DirectoryEntry {
         for i in 8..11 {
             extension_vec.push(directory_entry[i] as u16);
         }
-        let extension = String::from(String::from_utf16_lossy(&extension_vec).trim()).to_lowercase();
+        let extension = String::from(String::from_utf16_lossy(&extension_vec).trim())
+            .to_lowercase();
 
         let mut name_extension = String::with_capacity(11);
         name_extension.push_str(&name);
@@ -92,7 +93,7 @@ impl DirectoryEntry {
         self.file_size
     }
 
-    pub fn name_extension(&self) ->&String {
+    pub fn name_extension(&self) -> &String {
         &self.name_extension
     }
 }
