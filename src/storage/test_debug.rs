@@ -22,7 +22,7 @@ pub fn test() {
         panic!("not FAT32");
     }
 
-    let fat32_device_driver = Fat32DeviceDriver::new(&partition);
+    let fat32_device_driver = Fat32DeviceDriver::new(partition);
     let file_vec = fat32_device_driver.read_file_to_vec("tst.txt");
     if file_vec.is_some() {
         let file = String::from_utf8(file_vec.unwrap()).unwrap();
@@ -33,6 +33,7 @@ pub fn test() {
 
     //push to main repository
     //prompt metadata?!
-    //data to sdram
+    //data to sdram; sdram handle
     //buffer
+    //decrease block_size ->global const in block_device?
 }

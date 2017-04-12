@@ -5,8 +5,7 @@ use collections::vec::*;
 const PARTITION_TABLE_OFFSET: usize = 0x01BE;
 
 pub struct MbrDeviceDriver<'a> {
-    block_device: &'a BlockDevice,
-    mbr: Vec<u8>,
+    first_partition: Partition<'a>,
 }
 
 impl<'a> MbrDeviceDriver<'a> {
@@ -14,18 +13,21 @@ impl<'a> MbrDeviceDriver<'a> {
         if !(block_device.block_size() >= 512 && block_device.block_size() % 512 == 0) {
             panic!("512");
         }
+
+        let mbr = block_device.read_blocks(0, 1);
+
+        let mut first_entry: Vec<u8> = Vec::with_capacity(16);
+        for i in 0..16 {
+            first_entry.push(mbr[PARTITION_TABLE_OFFSET + i]);
+        }
+        let first_partition = Partition::new(block_device, first_entry);
+
         MbrDeviceDriver {
-            block_device: block_device,
-            mbr: block_device.read_blocks(0, 1),
+            first_partition: first_partition,
         }
     }
 
-    // shouldn't be created every time
-    pub fn get_first_partition(&self) -> Partition {
-        let mut first_entry: Vec<u8> = Vec::with_capacity(16);
-        for i in 0..16 {
-            first_entry.push(self.mbr[PARTITION_TABLE_OFFSET + i]);
-        }
-        Partition::new(self.block_device, first_entry)
+    pub fn get_first_partition(&self) -> &Partition {
+        &self.first_partition
     }
 }
