@@ -15,8 +15,6 @@ const FILE_SIZE_OFFSET: usize = 28; //4
 /// can represent a file or a directory
 /// unfinished!!!
 pub struct DirectoryEntry {
-    //String currently not in use
-    //bool isFree,
     is_file: bool,
     first_cluster_entry_number: usize,
     file_size: usize,
@@ -28,11 +26,13 @@ impl DirectoryEntry {
             panic!("32");
         }
 
+        /*
         println!("dir len: {:?}", directory_entry.len());
         for n in directory_entry {
             print!("{0:02.x}", n); // !!!
         }
         println!("");
+        */
 
         let high = two_bytes_at_offset(&directory_entry, FIRST_CLUSTER_HIGH_OFFSET) as u32;
         let low = two_bytes_at_offset(&directory_entry, FIRST_CLUSTER_LOW_OFFSET) as u32;
@@ -40,10 +40,9 @@ impl DirectoryEntry {
 
         let mut is_file = true;
         let attr = directory_entry[ATTRIBUTE_OFFSET];
-        println!("attr: {:x}", attr);
+        //println!("attr: {:x}", attr);
         let no_name = directory_entry[NAME_OFFSET];
-        println!("no_name:{:x}", no_name);
-        //check longname entry!!
+        //println!("no_name:{:x}", no_name);
 
         let mut is_volume_id = false;
         let mut is_directory = false;

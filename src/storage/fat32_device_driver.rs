@@ -19,13 +19,6 @@ in the file:
 (2048 + 4022) * 512 = 3107840 :first cluster (data)
 */
 
-/*
-cluster chain:
-next cluster:
-0x?0000002 - 0x?FFFFFEF
-not: end of cluster-chain (not standard)
-*/
-
 //(not implemented yet) Searches for directory-entry of name <>,
 //put the clusters together and returns a "DirectoryEntry"
 //--will be hardcoded first
@@ -71,6 +64,8 @@ impl<'a> Fat32DeviceDriver<'a> {
                                        number_of_reserved_blocks;
         let root_directory_cluster_offset = cluster_number_root_directory;
 
+        //println!("block_size_cluster: {:0}", block_size_cluster);
+
         Fat32DeviceDriver {
             block_device: block_device,
             block_size_sector: block_size_sector,
@@ -84,24 +79,23 @@ impl<'a> Fat32DeviceDriver<'a> {
     }
 
     /// dbg test
-    /// only one file in root
+    /// first file in root
     /// only one cluster per file
+    /// long name not implemented yet
     pub fn read_first_file_to_vec(&self) -> Vec<u8> {
         let file = self.first_file_directory_entry();
-        //let mut full = self.read_cluster_data_region(file.first_cluster());
+        println!("file_size: {:0}", file.file_size());
         let mut full = self.compile_clusters_begin_with_number(file.first_cluster());
-        println!("0: {:0}", file.first_cluster());
-        println!("1: {:0}", file.file_size());
-        println!("2: {:0}", full.len());
         full.split_off(file.file_size());
         full
     }
 
-    fn compile_clusters_begin_with_number(&self, offset: usize) ->Vec<u8> {
+    fn compile_clusters_begin_with_number(&self, offset: usize) -> Vec<u8> {
         let mut all = Vec::new();
         let mut current_offset = offset;
-        //[0x?0000002; 0x?FFFFFF6] //max should be checked
+        //[0x?0000002; 0x?FFFFFF6] //max should be calculated first
         while (current_offset & 0x0FFFFFFF) >= 0x2 && (current_offset & 0x0FFFFFFF) <= 0xFFFFFF6 {
+            println!("current_offset: {0:08.x}", current_offset);
             all.append(&mut self.read_cluster_data_region(current_offset));
             current_offset = self.read_in_fat(current_offset);
         }
@@ -111,7 +105,8 @@ impl<'a> Fat32DeviceDriver<'a> {
     fn first_file_directory_entry(&self) -> DirectoryEntry {
         let root = self.read_root_directory();
         let number: usize = root.len() / 32;
-        println!("number: {:?}", number);
+        //println!("number: {:?}", number);
+        // better: implement check is_last_entry
         for i in 0..number {
             println!("i: {:?}", i);
             let mut directory_entry = Vec::with_capacity(32);
@@ -130,9 +125,8 @@ impl<'a> Fat32DeviceDriver<'a> {
         self.read_cluster_data_region(self.root_directory_cluster_offset)
     }
 
-    /// entry in fat -> traversion not implemented yet
     fn read_in_fat(&self, offset: usize) -> usize {
-        //buffer for read block_device with offset
+        //better: buffer for read block_device with offset
         let block = self.block_device
             .read_blocks(self.number_of_reserved_blocks, 1);
         //4: byte-size of u32

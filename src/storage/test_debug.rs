@@ -13,7 +13,7 @@ use std::string::*;
 //check if compileable in microcontroller project!
 //tuple ->which size??
 
-// only useable with one file in the root directory, cant be searched; first will be used
+// first file in root directory will be selected automatically
 pub fn test() {
     let fsd = FileStorageDebug::new(Path::new("storage.img"));
     let mbr_device_driver = MbrDeviceDriver::new(&fsd);
@@ -27,4 +27,5 @@ pub fn test() {
     let file = String::from_utf8(fat32_device_driver.read_first_file_to_vec()).unwrap();
     println!("{:?}", file);
     //prompt metadata?!
+    //check warnings
 }
