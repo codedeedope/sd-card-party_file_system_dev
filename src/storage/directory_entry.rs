@@ -21,7 +21,7 @@ pub struct DirectoryEntry {
 }
 
 impl DirectoryEntry {
-    pub fn new(directory_entry: &Vec<u8>) -> DirectoryEntry {
+    pub fn new(directory_entry: &[u8]) -> DirectoryEntry {
         if directory_entry.len() != 32 {
             panic!("32");
         }

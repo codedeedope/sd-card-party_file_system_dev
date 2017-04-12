@@ -22,9 +22,7 @@ impl<'a> MbrDeviceDriver<'a> {
         }
         let first_partition = Partition::new(block_device, &first_entry);
 
-        MbrDeviceDriver {
-            first_partition: first_partition,
-        }
+        MbrDeviceDriver { first_partition: first_partition }
     }
 
     pub fn get_first_partition(&self) -> &Partition {

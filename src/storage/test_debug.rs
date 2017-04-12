@@ -5,13 +5,11 @@ use super::fat32_device_driver::*;
 use std::path::Path;
 use std::string::*;
 
-//unsafe code coulf increase speed at some points
+//unsafe code could increase speed at some points
 //use asserts instead of if ... {panic!(...)} !!!
 //slices: Prefer over owned type if only immutable access is needed
 //A concrete BlockDevice type for offset?
-//check if compileable in microcontroller project!
 //tuple ->which size??
-//optimize memory usage ->microcontroller doesnt have that much
 
 pub fn test() {
     let fsd = FileStorageDebug::new(Path::new("storage.img"));

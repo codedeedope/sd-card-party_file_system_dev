@@ -17,14 +17,15 @@ pub struct Partition<'a> {
 
 impl<'a> Partition<'a> {
     // note: start_block is the offset on block_device
-    pub fn new(block_device: &'a BlockDevice, partition_entry: &Vec<u8>) -> Partition<'a> {
+    pub fn new(block_device: &'a BlockDevice, partition_entry: &[u8]) -> Partition<'a> {
         if partition_entry.len() != 16 {
             panic!("16");
         }
 
         let partition_type = partition_entry[TYPE_OFFSET];
-        let start_block = four_bytes_at_offset(partition_entry, LBA_FIRST_SECTOR_OFFSET) as usize; //[sic!]
-        let block_count = four_bytes_at_offset(partition_entry, LBA_NUMBER_OF_SECTORS_OFFSET) as usize;
+        let start_block = four_bytes_at_offset(partition_entry, LBA_FIRST_SECTOR_OFFSET) as usize;
+        let block_count = four_bytes_at_offset(partition_entry, LBA_NUMBER_OF_SECTORS_OFFSET) as
+                          usize;
 
         Partition {
             block_device: block_device,
@@ -41,11 +42,12 @@ impl<'a> Partition<'a> {
 
 impl<'a> BlockDevice for Partition<'a> {
     fn read_blocks(&self, offset: usize, number: usize) -> Vec<u8> {
-        self.block_device.read_blocks(self.start_block + offset, number)
+        self.block_device
+            .read_blocks(self.start_block + offset, number)
     }
 
     #[allow(unused_variables)]
-    fn write_blocks(&self, offset: usize, blocks: Vec<u8>) -> Result<usize, ()> {
+    fn write_blocks(&self, offset: usize, blocks: &[u8]) -> Result<usize, ()> {
         unimplemented!();
     }
 

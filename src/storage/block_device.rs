@@ -14,7 +14,7 @@ pub trait BlockDevice {
     fn read_blocks(&self, offset: usize, number: usize) -> Vec<u8>;
     /// unimplemented!()
     /// ---should be called "write"
-    fn write_blocks(&self, offset: usize, blocks: Vec<u8>) -> Result<usize, ()>;
+    fn write_blocks(&self, offset: usize, blocks: &[u8]) -> Result<usize, ()>;
     /// ---should be size instead
     fn number_of_blocks(&self) -> usize;
     /// block_size should be 512 byte

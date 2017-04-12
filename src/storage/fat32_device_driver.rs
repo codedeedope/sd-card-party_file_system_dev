@@ -29,7 +29,7 @@ pub struct Fat32DeviceDriver<'a> {
 }
 
 impl<'a> Fat32DeviceDriver<'a> {
-    /// Partition::get_partition_type() == 0x0B has to be checked bevore
+    /// Partition::get_partition_type() == 0x0B has to be checked before
     pub fn new(block_device: &'a BlockDevice) -> Fat32DeviceDriver<'a> {
         if !(block_device.block_size() >= 512 && block_device.block_size() % 512 == 0) {
             panic!("wrong block_size");
@@ -68,6 +68,7 @@ impl<'a> Fat32DeviceDriver<'a> {
 
     /// only short name
     /// only in root directory
+    // sdram
     pub fn read_file_to_vec(&self, name_extension: &str) -> Option<Vec<u8>> {
         let opt_file = self.file_directory_entry(name_extension);
         let file = match opt_file {
@@ -79,6 +80,7 @@ impl<'a> Fat32DeviceDriver<'a> {
         Some(full)
     }
 
+    // sdram
     fn compile_clusters_begin_with_number(&self, offset: usize) -> Vec<u8> {
         let mut all = Vec::new();
         let mut current_offset = offset;
@@ -108,10 +110,12 @@ impl<'a> Fat32DeviceDriver<'a> {
         None
     }
 
+    // sdram
     fn read_root_directory(&self) -> Vec<u8> {
         self.read_cluster_data_region(self.root_directory_cluster_offset)
     }
 
+    // buffer
     fn read_in_fat(&self, offset: usize) -> usize {
         //better: buffer for read block_device with offset
         let block = self.block_device
@@ -120,6 +124,7 @@ impl<'a> Fat32DeviceDriver<'a> {
         (four_bytes_at_offset(&block, offset * 4) & 0x0FFFFFFF) as usize
     }
 
+    /// sdram
     fn read_cluster_data_region(&self, cluster_entry_offset: usize) -> Vec<u8> {
         //- 2 because the first two cluster-entries in the FAT are reserved
         //and dont represent clusters in the data section

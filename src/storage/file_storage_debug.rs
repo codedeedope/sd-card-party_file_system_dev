@@ -24,7 +24,7 @@ impl BlockDevice for FileStorageDebug {
     }
 
     #[allow(unused_variables)]
-    fn write_blocks(&self, offset: usize, blocks: Vec<u8>) -> Result<usize, ()> {
+    fn write_blocks(&self, offset: usize, blocks: &[u8]) -> Result<usize, ()> {
         unimplemented!();
     }
 
