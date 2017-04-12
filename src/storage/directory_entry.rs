@@ -1,6 +1,6 @@
 use super::get_bytes::*;
 use collections::vec::*;
-//use collections::string::*;
+use collections::string::*;
 
 // offset and number could be a tuple
 const NAME_OFFSET: usize = 0; //11
@@ -15,6 +15,7 @@ const FILE_SIZE_OFFSET: usize = 28; //4
 /// can represent a file or a directory
 /// unfinished!!!
 pub struct DirectoryEntry {
+    name_extension: String,
     is_file: bool,
     first_cluster_entry_number: usize,
     file_size: usize,
@@ -33,6 +34,26 @@ impl DirectoryEntry {
         }
         println!("");
         */
+
+        let mut name_vec = Vec::with_capacity(8);
+        for i in 0..8 {
+            name_vec.push(directory_entry[i] as u16);
+        }
+        let name = String::from(String::from_utf16_lossy(&name_vec).trim()).to_lowercase();
+
+        let mut extension_vec = Vec::with_capacity(3);
+        for i in 8..11 {
+            extension_vec.push(directory_entry[i] as u16);
+        }
+        let extension = String::from(String::from_utf16_lossy(&extension_vec).trim()).to_lowercase();
+
+        let mut name_extension = String::with_capacity(11);
+        name_extension.push_str(&name);
+        if !extension.is_empty() {
+            name_extension.push('.');
+            name_extension.push_str(&extension);
+        }
+        println!("name_extension: {:?}", name_extension);
 
         let high = two_bytes_at_offset(&directory_entry, FIRST_CLUSTER_HIGH_OFFSET) as u32;
         let low = two_bytes_at_offset(&directory_entry, FIRST_CLUSTER_LOW_OFFSET) as u32;
@@ -64,6 +85,7 @@ impl DirectoryEntry {
         let file_size = four_bytes_at_offset(&directory_entry, FILE_SIZE_OFFSET) as usize;
 
         DirectoryEntry {
+            name_extension: name_extension,
             is_file: is_file,
             first_cluster_entry_number: first_cluster_entry_number,
             file_size: file_size,
@@ -80,5 +102,9 @@ impl DirectoryEntry {
 
     pub fn file_size(&self) -> usize {
         self.file_size
+    }
+
+    pub fn name_extension(&self) ->String {
+        self.name_extension.clone()
     }
 }

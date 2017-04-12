@@ -7,6 +7,7 @@ use std::path::Path;
 use std::char;
 use std::string::*;
 
+//unsafe code coulf increase speed at some points
 //use asserts instead of if ... {panic!(...)} !!!
 //slices: Prefer over owned type if only immutable access is needed
 //A concrete BlockDevice type for offset?
@@ -25,7 +26,10 @@ pub fn test() {
 
     let fat32_device_driver = Fat32DeviceDriver::new(&partition);
     let file = String::from_utf8(fat32_device_driver.read_first_file_to_vec()).unwrap();
-    println!("{:?}", file);
+    //println!("{:?}", file);
+
+    //push to main repository
     //prompt metadata?!
     //check warnings
+    //prompt filename
 }
