@@ -26,11 +26,10 @@ next cluster:
 not: end of cluster-chain (not standard)
 */
 
-//Searches for directory-entry of name <>, put the clusters together and returns a "DirectoryEntry"
+//(not implemented yet) Searches for directory-entry of name <>,
+//put the clusters together and returns a "DirectoryEntry"
 //--will be hardcoded first
-//which can be a file or a directory
-//and can be free or not
-//->make a cluster of them? ->nope, break at first free
+//can be a file or a directory and can be free or not
 
 pub struct Fat32DeviceDriver<'a> {
     block_device: &'a BlockDevice,
@@ -89,12 +88,24 @@ impl<'a> Fat32DeviceDriver<'a> {
     /// only one cluster per file
     pub fn read_first_file_to_vec(&self) -> Vec<u8> {
         let file = self.first_file_directory_entry();
-        let mut full = self.read_cluster_data_region(file.first_cluster());
+        //let mut full = self.read_cluster_data_region(file.first_cluster());
+        let mut full = self.compile_clusters_begin_with_number(file.first_cluster());
         println!("0: {:0}", file.first_cluster());
         println!("1: {:0}", file.file_size());
         println!("2: {:0}", full.len());
         full.split_off(file.file_size());
         full
+    }
+
+    fn compile_clusters_begin_with_number(&self, offset: usize) ->Vec<u8> {
+        let mut all = Vec::new();
+        let mut current_offset = offset;
+        //[0x?0000002; 0x?FFFFFF6] //max should be checked
+        while (current_offset & 0x0FFFFFFF) >= 0x2 && (current_offset & 0x0FFFFFFF) <= 0xFFFFFF6 {
+            all.append(&mut self.read_cluster_data_region(current_offset));
+            current_offset = self.read_in_fat(current_offset);
+        }
+        all
     }
 
     fn first_file_directory_entry(&self) -> DirectoryEntry {
