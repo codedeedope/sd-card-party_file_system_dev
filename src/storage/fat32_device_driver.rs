@@ -22,11 +22,8 @@ in the file:
 
 pub struct Fat32DeviceDriver<'a> {
     block_device: &'a BlockDevice,
-    block_size_sector: usize,
     block_size_cluster: usize,
     number_of_reserved_blocks: usize,
-    number_of_fats: usize,
-    number_of_sectors_per_fat: usize,
     data_region_block_offset: usize,
     root_directory_cluster_offset: usize,
 }
@@ -62,11 +59,8 @@ impl<'a> Fat32DeviceDriver<'a> {
 
         Fat32DeviceDriver {
             block_device: block_device,
-            block_size_sector: block_size_sector,
             block_size_cluster: block_size_cluster,
             number_of_reserved_blocks: number_of_reserved_blocks,
-            number_of_fats: number_of_fats,
-            number_of_sectors_per_fat: number_of_sectors_per_fat,
             data_region_block_offset: data_region_block_offset,
             root_directory_cluster_offset: root_directory_cluster_offset,
         }

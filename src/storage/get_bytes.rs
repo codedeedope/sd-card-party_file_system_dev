@@ -1,4 +1,3 @@
-use super::block_device::BlockDevice;
 use collections::vec::*;
 
 pub fn four_bytes_at_offset(block: &Vec<u8>, offset: usize) -> u32 {

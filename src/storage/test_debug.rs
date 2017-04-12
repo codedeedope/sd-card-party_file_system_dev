@@ -1,6 +1,5 @@
 use super::file_storage_debug::*;
 use super::mbr_device_driver::*;
-use super::block_device::*;
 use super::fat32_device_driver::*;
 
 use std::path::Path;
@@ -27,12 +26,13 @@ pub fn test() {
     let file_vec = fat32_device_driver.read_file_to_vec("tst.txt");
     if file_vec.is_some() {
         let file = String::from_utf8(file_vec.unwrap()).unwrap();
-        //println!("{:?}", file);
+        println!("{:?}", file);
     } else {
         println!("file not found");
     }
 
     //push to main repository
     //prompt metadata?!
-    //check warnings
+    //data to sdram
+    //buffer
 }
