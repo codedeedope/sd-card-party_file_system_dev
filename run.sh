@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#doplhin root access!
-#mount
-
 sudo -s exit
 read -rsp $'Press enter to continue...\n'
 sudo losetup -P --show /dev/loop0 storage.img
