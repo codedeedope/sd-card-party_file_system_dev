@@ -1,0 +1,38 @@
+sudo dd if=/dev/zero of=/home/Fabi/_EigeneDat/_tmp/__tmp/storage.img bs=1M count=1000
+
+cd /home/Fabi/_EigeneDat/_tmp/__tmp/
+
+sudo fdisk storage.img
+p
+n
+w
+
+cat /proc/mounts | grep /dev/loop
+
+sudo losetup -P --show --find storage.img
+
+ls -l /dev/loop0*
+
+sudo partprobe -ds /dev/loop0
+
+sudo mkfs.vfat -F 32 /dev/loop0p1
+
+sudo fdisk storage.img
+t -> b
+w
+
+sudo mlabel -i /dev/loop0p1 ::FSLABEL
+
+sudo parted storage.img print
+
+Einbinden über Dolphin
+
+Dann Verzeichnisstruktur erstellen ->reinkopieren, nicht dort schreiben!
+
+Einbindung lösen über Dolphin
+
+sudo losetup -d /dev/loop0
+
+--checken mit wxHexEditor
+
+sudo dd if=/home/Fabi/_EigeneDat/_tmp/__tmp/storage.img of=/home/Fabi/_EigeneDat/_tmp/__tmp/storage_2.img bs=1M count=4

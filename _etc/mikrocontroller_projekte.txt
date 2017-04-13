@@ -1,0 +1,4 @@
+ein Konsolenfenster: st-util
+anderes: xargo build
+dann: sh gdb.sh
+c nicht vergessen beim gdb als Befehl

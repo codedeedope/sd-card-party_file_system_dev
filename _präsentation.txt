@@ -1,8 +1,0 @@
-Erst 10 min Implementierung
-Dann  5 min Showcase
-
-Einmal ausprobieren!
-
-davor:
-Terminal in ...file_sytem_dev öffnen
-sh run.sh
